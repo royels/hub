@@ -20,6 +20,7 @@ var (
 issue [-a <ASSIGNEE>] [-c <CREATOR>] [-@ <USER>] [-s <STATE>] [-f <FORMAT>] [-M <MILESTONE>] [-l <LABELS>] [-d <DATE>] [-o <SORT_KEY> [-^]] [-L <LIMIT>]
 issue create [-oc] [-m <MESSAGE>|-F <FILE>] [--edit] [-a <USERS>] [-M <MILESTONE>] [-l <LABELS>]
 issue labels [--color]
+issue view <TAG>
 `,
 		Long: `Manage GitHub issues for the current project.
 
@@ -153,6 +154,13 @@ With no arguments, show a list of open issues.
 		Long:  "Open an issue in the current project.",
 	}
 
+	cmdViewIssue = &Command{
+		Key:   "view",
+		Run:   viewIssue,
+		Usage: "issue view <TAG>",
+		Long:  "View an issue in the current project.",
+	}
+
 	cmdLabel = &Command{
 		Key:   "labels",
 		Run:   listLabels,
@@ -213,6 +221,7 @@ func init() {
 
 	cmdLabel.Flag.BoolVarP(&flagLabelsColorize, "color", "", false, "COLORIZE")
 
+	cmdIssue.Use(cmdViewIssue)
 	cmdIssue.Use(cmdCreateIssue)
 	cmdIssue.Use(cmdLabel)
 	CmdRunner.Use(cmdIssue)
@@ -369,6 +378,24 @@ func formatIssuePlaceholders(issue github.Issue, colorize bool) map[string]strin
 func formatIssue(issue github.Issue, format string, colorize bool) string {
 	placeholders := formatIssuePlaceholders(issue, colorize)
 	return ui.Expand(format, placeholders, colorize)
+}
+
+func viewIssue(cmd *Command, args *Args) {
+	issueNumber := cmd.Arg(0)
+	if issueNumber == "" {
+		utils.Check(fmt.Errorf(cmdViewIssue.Synopsis()))
+	}
+
+	localRepo, err := github.LocalRepo()
+	utils.Check(err)
+
+	project, err := localRepo.MainProject()
+	utils.Check(err)
+
+	gh := github.NewClient(project.Host)
+
+
+
 }
 
 func createIssue(cmd *Command, args *Args) {

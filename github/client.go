@@ -525,6 +525,12 @@ func (client *Client) ForkRepository(project *Project, params map[string]interfa
 	return
 }
 
+type Comment struct {
+	Id string `json:"id"`
+	Body string `json:"body"`
+}
+
+
 type Issue struct {
 	Number int    `json:"number"`
 	State  string `json:"state"`
@@ -538,7 +544,7 @@ type Issue struct {
 
 	MaintainerCanModify bool `json:"maintainer_can_modify"`
 
-	Comments  int          `json:"comments"`
+	Comments  []Comment          `json:"comments"`
 	Labels    []IssueLabel `json:"labels"`
 	Assignees []User       `json:"assignees"`
 	Milestone *Milestone   `json:"milestone"`
@@ -646,6 +652,41 @@ func (client *Client) FetchIssues(project *Project, filterParams map[string]inte
 		}
 	}
 
+	return
+}
+
+
+func (client *Client) FetchIssue(project *Project, number string) (issue *Issue, err error) {
+	api, err := client.simpleApi()
+	if err != nil {
+		return
+	}
+
+	res, err := api.Get(fmt.Sprintf("repos/%s/%s/issues/%s", project.Owner, project.Name, number))
+	if err = checkStatus(201, "fetching issue", res, err); err != nil {
+		return
+	}
+
+	issue = &Issue{}
+	err = res.Unmarshal(issue)
+	return
+}
+
+
+func(client *Client) FetchComments(project *Project, number int, params interface{}) (comments []Comment, err error) {
+	api, err := client.simpleApi()
+	if err != nil {
+		return
+	}
+
+	res, err := api.Get(fmt.Sprintf("repos/%s/%s/issues/%s/comments", project.Owner, project.Name, number))
+	if err = checkStatus(201, fmt.Sprintf("fetching comments for issue %s", number) , res, err); err != nil {
+		return
+	}
+
+	commet
+	issue = &Issue{}
+	err = res.Unmarshal(issue)
 	return
 }
 
