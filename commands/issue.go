@@ -400,12 +400,32 @@ func viewIssue(cmd *Command, args *Args) {
 	args.NoForward()
 
 
-	//ui.Printf("# %s\n# %s\n* created by @%s on %s\n* assignees: %s\n %s " +
-	//	"## Comments: \n" +
-	//		"%s", issue.)
+	commentsList, err := gh.FetchComments(project, issueNumber)
+	utils.Check(err)
 
 
-	ui.Printf("%s %s", issue.CreatedAt.String(), issue.Comments)
+
+	var assignees []string
+	for _, user := range issue.Assignees {
+		assignees = append(assignees, user.Login)
+	}
+
+
+
+
+	var comments []string
+	for _, comment := range commentsList {
+		comments = append(comments, fmt.Sprintf(
+			"### comment by @%s on %s\n\n" +
+					"%s\n", comment.User.Login, comment.CreatedAt.String(), comment.Body))
+	}
+
+	ui.Printf("\n# %s\n\n" +
+		"* created by @%s on %s\n" +
+		"* assignees: %s\n %s \n" +
+		"## Comments: \n" +
+			"%s", issue.Title, issue.User.Login, issue.CreatedAt.String(), strings.Join(assignees, ", "), issue.Body, strings.Join(comments, ""))
+
 	return
 }
 

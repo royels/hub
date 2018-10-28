@@ -526,7 +526,7 @@ func (client *Client) ForkRepository(project *Project, params map[string]interfa
 }
 
 type Comment struct {
-	Id   string `json:"id"`
+	Id   int `json:"id"`
 	Body string `json:"body"`
 	User *User  `json:"user"`
 	CreatedAt time.Time `json:"created_at"`
@@ -677,15 +677,15 @@ func (client *Client) FetchIssue(project *Project, number string) (issue *Issue,
 }
 
 
-func(client *Client) FetchComments(project *Project, number string, params interface{}) (comments []Comment, err error) {
+func(client *Client) FetchComments(project *Project, number string) (comments []Comment, err error) {
 	api, err := client.simpleApi()
 	if err != nil {
 		return
 	}
 
 	res, err := api.Get(fmt.Sprintf("repos/%s/%s/issues/%s/comments", project.Owner, project.Name, number))
-	if err = checkStatus(201, fmt.Sprintf("fetching comments for issue %s", number) , res, err); err != nil {
-		return
+	if err = checkStatus(200, fmt.Sprintf("fetching comments for issue %s", number) , res, err); err != nil {
+		return nil, fmt.Errorf("Unable to get comments for issue %s", number)
 	}
 
 	comments = []Comment{}
