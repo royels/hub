@@ -660,7 +660,7 @@ func (client *Client) FetchIssues(project *Project, filterParams map[string]inte
 }
 
 
-func (client *Client) FetchIssue(project *Project, number string) (issue Issue, err error) {
+func (client *Client) FetchIssue(project *Project, number string) (issue *Issue, err error) {
 	api, err := client.simpleApi()
 	if err != nil {
 		return
@@ -668,11 +668,11 @@ func (client *Client) FetchIssue(project *Project, number string) (issue Issue, 
 
 	res, err := api.Get(fmt.Sprintf("repos/%s/%s/issues/%s", project.Owner, project.Name, number))
 	if err = checkStatus(200, "fetching issue", res, err); err != nil {
-		return
+		return nil, fmt.Errorf("Unable to find issue with number: %s ", number)
 	}
 
-	issue = Issue{}
-	err = res.Unmarshal(&issue)
+	issue = &Issue{}
+	err = res.Unmarshal(issue)
 	return
 }
 

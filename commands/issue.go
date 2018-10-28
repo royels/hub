@@ -382,7 +382,7 @@ func formatIssue(issue github.Issue, format string, colorize bool) string {
 
 func viewIssue(cmd *Command, args *Args) {
 	issueNumber := cmd.Arg(0)
-	if issueNumber == "" {
+	if issueNumber == ""  {
 		utils.Check(fmt.Errorf(cmd.Synopsis()))
 	}
 
@@ -394,7 +394,7 @@ func viewIssue(cmd *Command, args *Args) {
 
 	gh := github.NewClient(project.Host)
 
-	var issue = github.Issue{}
+	var issue = &github.Issue{}
 	issue, err = gh.FetchIssue(project, issueNumber)
 	utils.Check(err)
 	args.NoForward()
