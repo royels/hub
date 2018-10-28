@@ -399,19 +399,18 @@ func viewIssue(cmd *Command, args *Args) {
 	utils.Check(err)
 	args.NoForward()
 
-
+	var closed = ""
+	if(issue.ClosedBy != nil) {
+		closed = "[CLOSED] "
+	}
 	commentsList, err := gh.FetchComments(project, issueNumber)
 	utils.Check(err)
-
 
 
 	var assignees []string
 	for _, user := range issue.Assignees {
 		assignees = append(assignees, user.Login)
 	}
-
-
-
 
 	var comments []string
 	for _, comment := range commentsList {
@@ -424,7 +423,7 @@ func viewIssue(cmd *Command, args *Args) {
 		"* created by @%s on %s\n" +
 		"* assignees: %s\n %s \n" +
 		"## Comments: \n" +
-			"%s", issue.Title, issue.User.Login, issue.CreatedAt.String(), strings.Join(assignees, ", "), issue.Body, strings.Join(comments, ""))
+			"%s", closed + issue.Title, issue.User.Login, issue.CreatedAt.String(), strings.Join(assignees, ", "), issue.Body, strings.Join(comments, ""))
 
 	return
 }
