@@ -526,8 +526,10 @@ func (client *Client) ForkRepository(project *Project, params map[string]interfa
 }
 
 type Comment struct {
-	Id string `json:"id"`
+	Id   string `json:"id"`
 	Body string `json:"body"`
+	User *User  `json:"user"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 
@@ -544,7 +546,7 @@ type Issue struct {
 
 	MaintainerCanModify bool `json:"maintainer_can_modify"`
 
-	Comments  []Comment          `json:"comments"`
+	Comments  int          `json:"comments"`
 	Labels    []IssueLabel `json:"labels"`
 	Assignees []User       `json:"assignees"`
 	Milestone *Milestone   `json:"milestone"`
@@ -556,6 +558,8 @@ type Issue struct {
 
 	ApiUrl  string `json:"url"`
 	HtmlUrl string `json:"html_url"`
+
+	ClosedBy *User `json:"closed_by"`
 }
 
 type PullRequest Issue
@@ -656,24 +660,24 @@ func (client *Client) FetchIssues(project *Project, filterParams map[string]inte
 }
 
 
-func (client *Client) FetchIssue(project *Project, number string) (issue *Issue, err error) {
+func (client *Client) FetchIssue(project *Project, number string) (issue Issue, err error) {
 	api, err := client.simpleApi()
 	if err != nil {
 		return
 	}
 
 	res, err := api.Get(fmt.Sprintf("repos/%s/%s/issues/%s", project.Owner, project.Name, number))
-	if err = checkStatus(201, "fetching issue", res, err); err != nil {
+	if err = checkStatus(200, "fetching issue", res, err); err != nil {
 		return
 	}
 
-	issue = &Issue{}
-	err = res.Unmarshal(issue)
+	issue = Issue{}
+	err = res.Unmarshal(&issue)
 	return
 }
 
 
-func(client *Client) FetchComments(project *Project, number int, params interface{}) (comments []Comment, err error) {
+func(client *Client) FetchComments(project *Project, number string, params interface{}) (comments []Comment, err error) {
 	api, err := client.simpleApi()
 	if err != nil {
 		return
@@ -684,9 +688,10 @@ func(client *Client) FetchComments(project *Project, number int, params interfac
 		return
 	}
 
-	commet
-	issue = &Issue{}
-	err = res.Unmarshal(issue)
+	comments = []Comment{}
+	if err = res.Unmarshal(&comments); err != nil {
+		return
+	}
 	return
 }
 

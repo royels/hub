@@ -383,7 +383,7 @@ func formatIssue(issue github.Issue, format string, colorize bool) string {
 func viewIssue(cmd *Command, args *Args) {
 	issueNumber := cmd.Arg(0)
 	if issueNumber == "" {
-		utils.Check(fmt.Errorf(cmdViewIssue.Synopsis()))
+		utils.Check(fmt.Errorf(cmd.Synopsis()))
 	}
 
 	localRepo, err := github.LocalRepo()
@@ -394,8 +394,19 @@ func viewIssue(cmd *Command, args *Args) {
 
 	gh := github.NewClient(project.Host)
 
+	var issue = github.Issue{}
+	issue, err = gh.FetchIssue(project, issueNumber)
+	utils.Check(err)
+	args.NoForward()
 
 
+	//ui.Printf("# %s\n# %s\n* created by @%s on %s\n* assignees: %s\n %s " +
+	//	"## Comments: \n" +
+	//		"%s", issue.)
+
+
+	ui.Printf("%s %s", issue.CreatedAt.String(), issue.Comments)
+	return
 }
 
 func createIssue(cmd *Command, args *Args) {
