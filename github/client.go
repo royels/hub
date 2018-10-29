@@ -668,7 +668,7 @@ func (client *Client) FetchIssue(project *Project, number string) (issue *Issue,
 
 	res, err := api.Get(fmt.Sprintf("repos/%s/%s/issues/%s", project.Owner, project.Name, number))
 	if err = checkStatus(200, "fetching issue", res, err); err != nil {
-		return nil, fmt.Errorf("Unable to find issue with number: %s due to ", number, err.Error())
+		return nil, fmt.Errorf("Unable to find issue with number: %s", number)
 	}
 
 	issue = &Issue{}
@@ -685,7 +685,7 @@ func(client *Client) FetchComments(project *Project, number string) (comments []
 
 	res, err := api.Get(fmt.Sprintf("repos/%s/%s/issues/%s/comments", project.Owner, project.Name, number))
 	if err = checkStatus(200, fmt.Sprintf("fetching comments for issue %s", number) , res, err); err != nil {
-		return nil, fmt.Errorf("Unable to get comments for issue %s due to error: ", number, err.Error())
+		return nil, fmt.Errorf("Unable to get comments for issue %s", number)
 	}
 
 	comments = []Comment{}

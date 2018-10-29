@@ -157,7 +157,7 @@ With no arguments, show a list of open issues.
 	cmdViewIssue = &Command{
 		Key:   "view",
 		Run:   viewIssue,
-		Usage: "issue view <TAG>",
+		Usage: "issue view <NUMBER>",
 		Long:  "View an issue in the current project.",
 	}
 
@@ -421,9 +421,15 @@ func viewIssue(cmd *Command, args *Args) {
 
 	ui.Printf("\n# %s\n\n" +
 		"* created by @%s on %s\n" +
-		"* assignees: %s\n %s \n" +
-		"## Comments: \n" +
-			"%s", closed + issue.Title, issue.User.Login, issue.CreatedAt.String(), strings.Join(assignees, ", "), issue.Body, strings.Join(comments, ""))
+		"* assignees: %s\n" +
+		"%s\n" +
+		"## Comments:\n" +
+			"%s", closed + issue.Title,
+				issue.User.Login,
+					issue.CreatedAt.String(),
+						strings.Join(assignees, ", "),
+							issue.Body,
+								strings.Join(comments, ""))
 
 	return
 }
